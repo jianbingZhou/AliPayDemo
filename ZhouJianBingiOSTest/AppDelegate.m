@@ -7,7 +7,15 @@
 //
 
 #import "AppDelegate.h"
+#import "ZjbMainViewController.h"
+#import "UMSocial.h"
+#import "UMSocialQQHandler.h"
 
+#define UMappKey  @"573ec7f7e0f55a65f8000eaa"
+#define QQAPPID   @"1105341201"//41e22b11
+#define QQAPPKEY  @"DxBwH1TKGBljLaMc"
+
+//Zhou.ZhouJianBingiOSTest
 @interface AppDelegate ()
 
 @end
@@ -17,8 +25,29 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    ZjbMainViewController *zjbMainVc = [[ZjbMainViewController alloc] init];
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:zjbMainVc];
+    self.window.rootViewController = nav;
+    [self.window makeKeyAndVisible];
+    
+     [UMSocialData setAppKey:UMappKey];
+      [UMSocialQQHandler setQQWithAppId:QQAPPID appKey:QQAPPKEY url:@"http://www.umeng.com/social"];
+    [UMSocialData openLog:YES];
+    
     return YES;
 }
+
+//在APPdelegate.m中增加下面的系统回调配置，注意如果同时使用微信支付、支付宝等其他需要改写回调代理的SDK，请在if分支下做区分，否则会影响 分享、登录的回调
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
+{
+    BOOL result = [UMSocialSnsService handleOpenURL:url];
+    if (result == FALSE) {
+        //调用其他SDK，例如支付宝SDK等
+    }
+    return result;
+}
+
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
